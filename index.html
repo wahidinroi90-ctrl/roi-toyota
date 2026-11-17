@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c6845">
+<meta name="description" content="Aplikasi pengelola customer dan pengingat follow up ROI TOYOTA.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<title>ROI TOYOTA • FU Customer</title>
+<style>
+:root{--g:#0c6845;--g2:#138657;--mint:#e9f5ee;--bg:#f4f7f5;--ink:#17251d;--muted:#718077;--line:#e1e9e3;--white:#fff;--amber:#fff3d9;--red:#fff0f0;--shadow:0 8px 28px #173b2410}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(135deg,#084b33,#138657);color:#fff;padding:23px 17px 28px;border-radius:0 0 25px 25px}
+.head{max-width:780px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:11px}.logo{width:45px;height:45px;border-radius:14px;background:#ffffff20;display:grid;place-items:center;font-weight:900;font-size:19px;border:1px solid #ffffff35}
+h1{font-size:19px;margin:0;letter-spacing:.3px}header p{margin:3px 0 0;font-size:12px;opacity:.85}
+main{max-width:780px;margin:auto;padding:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:-8px}
+.stat,.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.stat{padding:13px 11px}.stat b{display:block;font-size:24px;color:var(--g)}.stat span{font-size:11px;color:var(--muted)}
+.panel{padding:15px;margin-top:13px}
+h2{font-size:16px;margin:0 0 13px}.sub{font-size:12px;color:var(--muted)}
+label{display:block;font-size:12px;color:#53645a;font-weight:650;margin-bottom:10px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid #d8e2da;border-radius:10px;font:14px system-ui;background:#fff;color:var(--ink);margin-top:5px;min-width:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wide{grid-column:1/-1}
+button,.btn{border:0;border-radius:10px;padding:11px 13px;background:var(--g);color:#fff;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+button.alt,.btn.alt{background:var(--mint);color:var(--g)}button.softred{background:var(--red);color:#b4232e}
+button:disabled{opacity:.45}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.customer{border:1px solid var(--line);border-radius:13px;padding:13px;margin-top:10px;background:#fff}
+.customer h3{font-size:15px;margin:0}.customer p{margin:5px 0;color:var(--muted);font-size:12px;line-height:1.45}
+.badge{font-size:10px;padding:4px 8px;border-radius:20px;background:var(--mint);color:var(--g);font-weight:800}
+.badge.today{background:var(--amber);color:#8b5b00}.badge.late{background:var(--red);color:#b4232e}
+.hidden{display:none!important}#empty{text-align:center;padding:22px;color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:7px;overflow:auto;margin:14px 0 0}.tabs button{white-space:nowrap;background:#ffffff20;color:white;border:1px solid #ffffff40;padding:8px 11px}.tabs button.active{background:white;color:var(--g)}
+.notice{background:#f0f7f2;border:1px solid #dcebe0;border-radius:11px;padding:10px 11px;color:#476052;font-size:11px;line-height:1.5;margin-top:10px}
+footer{text-align:center;padding:18px;color:var(--muted);font-size:11px}
+@media(max-width:430px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.stats{gap:6px}.stat{padding:11px 8px}.stat b{font-size:21px}.head .install{padding:9px;font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="head">
+  <div class="brand"><div class="logo">RT</div><div><h1>ROI TOYOTA</h1><p>CUSTOMER MANAGEMENT • FOLLOW UP</p></div></div>
+  <button class="install" id="installBtn" type="button">＋ Pasang App</button>
+ </div>
+ <div class="head" style="margin-top:17px"><div><div style="font-size:20px;font-weight:800">Halo, Marketing! 👋</div><div style="font-size:12px;opacity:.85">Jangan lewatkan jadwal follow up customer.</div></div><div style="font-size:12px;text-align:right" id="todayLabel"></div></div>
+ <nav class="tabs">
+  <button class="active" data-tab="dashboard">Dashboard</button><button data-tab="add">Tambah Customer</button><button data-tab="data">Data Customer</button><button data-tab="backup">Backup Data</button>
+ </nav>
+</header>
+<main>
+<section id="dashboard">
+ <div class="stats">
+  <div class="stat"><b id="total">0</b><span>Total customer</span></div>
+  <div class="stat"><b id="due">0</b><span>FU hari ini</span></div>
+  <div class="stat"><b id="late">0</b><span>Terlambat FU</span></div>
+ </div>
+ <div class="panel"><div class="row"><h2>Prioritas Follow Up</h2><button class="alt" id="notifyBtn">🔔 Aktifkan notifikasi</button></div><div id="priority"></div><div id="priorityEmpty" class="sub hidden">Belum ada jadwal FU yang perlu ditindaklanjuti.</div>
+ <div class="notice">Pengingat otomatis diperiksa saat aplikasi dibuka. Agar lebih konsisten, izinkan notifikasi dan buka aplikasi secara berkala. Notifikasi saat aplikasi benar-benar tertutup memerlukan layanan push/server atau aplikasi Android native.</div>
+ </div>
+ <div class="panel"><h2>Ringkasan Status</h2><div id="summary" class="sub"></div></div>
+</section>
+<section id="add" class="hidden">
+ <div class="panel"><div class="row"><h2 id="formTitle">Tambah Customer Baru</h2><span class="sub">* Wajib diisi</span></div>
+ <form id="form"><input type="hidden" id="editId">
+ <div class="grid">
+  <label>Nama customer *<input id="name" required placeholder="Nama lengkap"></label>
+  <label>Nomor WhatsApp<input id="phone" inputmode="tel" placeholder="08xxxxxxxxxx"></label>
+  <label>Unit Toyota diminati<select id="unit"><option value="">Pilih unit</option><option>Agya</option><option>Calya</option><option>Avanza</option><option>Rush</option><option>Raize</option><option>Veloz</option><option>Innova Zenix</option><option>Fortuner</option><option>Hilux Rangga</option><option>Lainnya</option></select></label>
+  <label>Status customer<select id="status"><option>Customer Baru</option><option>Sudah Dihubungi</option><option>Prospek</option><option>Negosiasi</option><option>SPK</option><option>Tidak Lanjut</option></select></label>
+  <label>Tanggal FU berikutnya *<input id="date" type="date" required></label>
+  <label>Jam FU<input id="time" type="time" value="09:00"></label>
+  <label class="wide">Catatan kebutuhan / hasil komunikasi<textarea id="notes" rows="3" placeholder="Contoh: minta simulasi kredit, rencana pembelian akhir bulan..."></textarea></label>
+ </div>
+ <div class="actions"><button type="submit" id="saveBtn">Simpan Customer</button><button class="alt hidden" type="button" id="cancelBtn">Batal</button></div></form></div>
+</section>
+<section id="data" class="hidden">
+ <div class="panel"><h2>Semua Customer</h2><input id="search" placeholder="Cari nama, nomor, atau unit...">
+ <div class="grid" style="margin-top:8px"><label>Filter jadwal<select id="filter"><option value="all">Semua jadwal</option><option value="today">FU hari ini</option><option value="late">Terlambat</option><option value="future">Mendatang</option></select></label><label>Filter status<select id="statusFilter"><option value="all">Semua status</option><option>Customer Baru</option><option>Sudah Dihubungi</option><option>Prospek</option><option>Negosiasi</option><option>SPK</option><option>Tidak Lanjut</option></select></label></div>
+ <div id="list"></div><div id="empty" class="hidden">Belum ada data customer.</div></div>
+</section>
+<section id="backup" class="hidden">
+ <div class="panel"><h2>Backup & Keamanan Data</h2><p class="sub">Data tersimpan di browser/perangkat ini. Cadangkan data secara berkala agar tidak hilang saat data browser dibersihkan atau HP berganti.</p>
+ <div class="actions"><button id="backupBtn">⬇ Unduh Backup</button><button class="alt" id="restoreBtn">⬆ Pulihkan Backup</button><input class="hidden" type="file" id="restoreFile" accept="application/json"></div>
+ <div class="notice">File backup berisi data customer. Simpan dengan aman dan jangan bagikan kepada orang yang tidak berkepentingan.</div>
+ <div class="actions"><button class="softred" id="clearBtn">Hapus Semua Data</button></div></div>
+</section>
+<footer>ROI TOYOTA • FU CUSTOMER • Data tersimpan lokal di perangkat.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id),KEY='roiToyotaCustomersV2';
+let data=[];try{data=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){data=[]}
+const iso=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const persist=()=>localStorage.setItem(KEY,JSON.stringify(data));
+const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const finished=c=>['SPK','Tidak Lanjut'].includes(c.status);
+const state=c=>finished(c)?'done':c.date<iso()?'late':c.date===iso()?'today':'future';
+function setTab(t){document.querySelectorAll('main>section').forEach(s=>s.classList.add('hidden'));$(t).classList.remove('hidden');document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));if(t==='data')renderList();if(t==='dashboard')renderDashboard();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+$('todayLabel').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function badge(c){let s=state(c);return `<span class="badge ${s==='late'?'late':s==='today'?'today':''}">${s==='late'?'Terlambat FU':s==='today'?'FU hari ini':s==='done'?'Selesai':'Jadwal mendatang'}</span>`}
+function card(c){let wa=c.phone?'https://wa.me/'+c.phone.replace(/\D/g,'').replace(/^0/,'62'):'';return `<article class="customer"><div class="row"><h3>${esc(c.name)}</h3>${badge(c)}</div><p>${esc(c.unit||'Unit belum dipilih')} • ${esc(c.status)}</p><p>Jadwal FU: <b>${esc(c.date)}</b> pukul ${esc(c.time||'09:00')} ${c.phone?'• '+esc(c.phone):''}</p>${c.notes?`<p>Catatan: ${esc(c.notes)}</p>`:''}<div class="actions">${wa?`<a class="btn" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}<button class="alt" onclick="editItem('${c.id}')">Edit</button><button class="alt" onclick="markSpk('${c.id}')">Tandai SPK</button><button class="softred" onclick="removeItem('${c.id}')">Hapus</button></div></article>`}
+function renderDashboard(){let active=data.filter(c=>!finished(c));$('total').textContent=data.length;$('due').textContent=active.filter(c=>c.date===iso()).length;$('late').textContent=active.filter(c=>c.date<iso()).length;
+let priority=active.filter(c=>c.date<=iso()).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));$('priority').innerHTML=priority.slice(0,6).map(card).join('');$('priorityEmpty').classList.toggle('hidden',priority.length>0);
+let statuses=['Customer Baru','Sudah Dihubungi','Prospek','Negosiasi','SPK','Tidak Lanjut'];$('summary').innerHTML=statuses.map(s=>`${esc(s)}: <b>${data.filter(c=>c.status===s).length}</b>`).join(' &nbsp; • &nbsp; ')}
+function renderList(){let q=$('search').value.toLowerCase(),f=$('filter').value,sf=$('statusFilter').value;let a=data.filter(c=>[c.name,c.phone,c.unit,c.notes].join(' ').toLowerCase().includes(q)&&(f==='all'||state(c)===f)&&(sf==='all'||c.status===sf)).sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time));$('list').innerHTML=a.map(card).join('');$('empty').classList.toggle('hidden',a.length>0)}
+$('form').onsubmit=e=>{e.preventDefault();let id=$('editId').value||crypto.randomUUID();let c={id,name:$('name').value.trim(),phone:$('phone').value.trim(),unit:$('unit').value,status:$('status').value,date:$('date').value,time:$('time').value||'09:00',notes:$('notes').value.trim()};let i=data.findIndex(x=>x.id===id);if(i>=0)data[i]=c;else data.push(c);persist();resetForm();setTab('dashboard');renderDashboard();};
+function resetForm(){$('form').reset();$('editId').value='';$('time').value='09:00';$('formTitle').textContent='Tambah Customer Baru';$('saveBtn').textContent='Simpan Customer';$('cancelBtn').classList.add('hidden')}
+$('cancelBtn').onclick=resetForm;
+window.editItem=id=>{let c=data.find(x=>x.id===id);if(!c)return;['name','phone','unit','status'].forEach(k=>$(k).value=c[k]||'');$('date').value=c.date;$('time').value=c.time||'09:00';$('notes').value=c.notes||'';$('editId').value=id;$('formTitle').textContent='Edit Customer';$('saveBtn').textContent='Simpan Perubahan';$('cancelBtn').classList.remove('hidden');setTab('add')};
+window.markSpk=id=>{let c=data.find(x=>x.id===id);if(c){c.status='SPK';persist();renderDashboard();renderList()}};
+window.removeItem=id=>{if(confirm('Yakin ingin menghapus customer ini?')){data=data.filter(x=>x.id!==id);persist();renderDashboard();renderList()}};
+$('search').oninput=renderList;$('filter').onchange=renderList;$('statusFilter').onchange=renderList;
+$('backupBtn').onclick=()=>download('roi-toyota-backup.json',JSON.stringify({app:'ROI TOYOTA FU Customer',version:2,exportedAt:new Date().toISOString(),customers:data},null,2),'application/json');
+function download(name,content,type){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+$('restoreBtn').onclick=()=>$('restoreFile').click();
+$('restoreFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let obj=JSON.parse(await f.text()),incoming=Array.isArray(obj)?obj:obj.customers;if(!Array.isArray(incoming))throw Error();if(confirm(`Pulihkan ${incoming.length} data? Data saat ini akan diganti.`)){data=incoming;persist();renderDashboard();renderList();alert('Backup berhasil dipulihkan.')}}catch(err){alert('File backup tidak valid.')}e.target.value=''};
+$('clearBtn').onclick=()=>{if(confirm('Hapus seluruh data customer dari perangkat ini? Pastikan sudah membuat backup.')){data=[];persist();renderDashboard();renderList()}};
+$('notifyBtn').onclick=async()=>{if(!('Notification'in window)){alert('Browser ini tidak mendukung notifikasi.');return}let p=await Notification.requestPermission();alert(p==='granted'?'Notifikasi diizinkan. Pengingat akan dicek saat aplikasi dibuka.':'Izin notifikasi belum diberikan.')};
+function reminders(){if(!('Notification'in window)||Notification.permission!=='granted')return;let now=new Date(),hh=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');data.filter(c=>!finished(c)&&c.date===iso()&&(c.time||'09:00')<=hh).forEach(c=>{let k='roiReminder_'+c.id+'_'+iso();if(!localStorage.getItem(k)){new Notification('Waktunya Follow Up Customer',{body:c.name+' • '+(c.unit||'Unit belum dipilih')});localStorage.setItem(k,'1')}})}
+let installPrompt=null;$('installBtn').onclick=async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null}else alert('Jika tombol pemasangan belum tersedia: buka menu ⋮ Chrome, lalu pilih “Tambahkan ke layar utama” atau “Install app”.')};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e});
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if(!$('date').value)$('date').value=iso();renderDashboard();reminders();setInterval(reminders,60000);
+</script>
+</body></html>
